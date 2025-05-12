@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书馆座位管理系统</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #1e88e5;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        .main-content {
+            display: flex;
+            margin-top: 30px;
+            gap: 20px;
+        }
+        .login-section, .reservation-section {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+        h2 {
+            color: #1e88e5;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #1565c0;
+        }
+        .seats-list {
+            margin-top: 20px;
+        }
+        .seat-item {
+            background-color: #e3f2fd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .seat-item.available {
+            border-left: 4px solid #4caf50;
+        }
+        .seat-item.occupied {
+            border-left: 4px solid #f44336;
+        }
+        .seat-item.maintenance {
+            border-left: 4px solid #ff9800;
+        }
+        .hidden {
+            display: none;
+        }
+        #userInfo {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        #reservationForm {
+            display: none;
+        }
+        #message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>图书馆座位管理系统</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="login-section" id="loginSection">
+                <h2>用户登录</h2>
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label for="username">用户名</label>
+                        <input type="text" id="username" placeholder="请输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" id="password" placeholder="请输入密码">
+                    </div>
+                    <button id="loginBtn">登录</button>
+                    <p>没有账号？<a href="#" id="showRegisterBtn">注册</a></p>
+                </div>
+
+                <div id="registerForm" class="hidden">
+                    <div class="form-group">
+                        <label for="regUsername">用户名</label>
+                        <input type="text" id="regUsername" placeholder="请输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">密码</label>
+                        <input type="password" id="regPassword" placeholder="请输入密码">
+                    </div>
+                    <div class="form-group">
+                        <label for="regName">姓名</label>
+                        <input type="text" id="regName" placeholder="请输入姓名">
+                    </div>
+                    <button id="registerBtn">注册</button>
+                    <p>已有账号？<a href="#" id="showLoginBtn">登录</a></p>
+                </div>
+
+                <div id="userInfo" class="hidden">
+                    <h3>欢迎，<span id="userName"></span></h3>
+                    <p>用户名：<span id="userUsername"></span></p>
+                    <button id="logoutBtn">退出登录</button>
+                </div>
+
+                <div id="message"></div>
+            </div>
+
+            <div class="reservation-section">
+                <h2>座位预约</h2>
+                <div id="seatsContainer">
+                    <p>请先登录以查看和预约座位</p>
+                </div>
+
+                <div id="reservationForm">
+                    <h3>预约座位</h3>
+                    <div class="form-group">
+                        <label for="seatId">座位编号</label>
+                        <input type="text" id="seatId" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="startTime">开始时间</label>
+                        <input type="datetime-local" id="startTime">
+                    </div>
+                    <div class="form-group">
+                        <label for="endTime">结束时间</label>
+                        <input type="datetime-local" id="endTime">
+                    </div>
+                    <button id="reserveBtn">确认预约</button>
+                    <button id="cancelReserveBtn">取消</button>
+                </div>
+
+                <div id="userReservations" class="hidden">
+                    <h3>我的预约</h3>
+                    <div id="reservationsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let token = '';
+        let currentUser = '';
+
+        // DOM元素
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const userInfo = document.getElementById('userInfo');
+        const messageDiv = document.getElementById('message');
+        const seatsContainer = document.getElementById('seatsContainer');
+        const reservationForm = document.getElementById('reservationForm');
+        const userReservations = document.getElementById('userReservations');
+
+        // 显示消息
+        function showMessage(text, isError = false) {
+            messageDiv.textContent = text;
+            messageDiv.className = isError ? 'error' : 'success';
+            setTimeout(() => {
+                messageDiv.textContent = '';
+                messageDiv.className = '';
+            }, 3000);
+        }
+
+        // 切换登录/注册表单
+        document.getElementById('showRegisterBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+        });
+
+        document.getElementById('showLoginBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+        });
+
+        // 登录功能
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showMessage('用户名和密码不能为空', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/users/login?username=${username}&password=${password}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    token = data.token;
+                    currentUser = data.username;
+                    
+                    // 更新UI
+                    document.getElementById('userName').textContent = data.name;
+                    document.getElementById('userUsername').textContent = data.username;
+                    loginForm.classList.add('hidden');
+                    userInfo.classList.remove('hidden');
+                    
+                    showMessage('登录成功');
+                    loadSeats();
+                    loadUserReservations();
+                } else {
+                    const error = await response.text();
+                    showMessage(error, true);
+                }
+            } catch (error) {
+                showMessage('登录失败，请稍后再试', true);
+                console.error('登录错误:', error);
+            }
+        });
+
+        // 注册功能
+        document.getElementById('registerBtn').addEventListener('click', async () => {
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const name = document.getElementById('regName').value;
+
+            if (!username || !password || !name) {
+                showMessage('所有字段都必须填写', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/users/register?username=${username}&password=${password}&name=${name}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    showMessage('注册成功，请登录');
+                    registerForm.classList.add('hidden');
+                    loginForm.classList.remove('hidden');
+                } else {
+                    const error = await response.text();
+                    showMessage(error, true);
+                }
+            } catch (error) {
+                showMessage('注册失败，请稍后再试', true);
+                console.error('注册错误:', error);
+            }
+        });
+
+        // 退出登录
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            token = '';
+            currentUser = '';
+            userInfo.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            seatsContainer.innerHTML = '<p>请先登录以查看和预约座位</p>';
+            userReservations.classList.add('hidden');
+            showMessage('已退出登录');
+        });
+
+        // 加载座位列表
+        async function loadSeats() {
+            if (!token) return;
+
+            try {
+                const response = await fetch('/api/seats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const seats = await response.json();
+                    displaySeats(seats);
+                } else {
+                    showMessage('获取座位信息失败', true);
+                }
+            } catch (error) {
+                console.error('加载座位错误:', error);
+            }
+        }
+
+        // 显示座位列表
+        function displaySeats(seats) {
+            seatsContainer.innerHTML = '<h3>可用座位</h3>';
+            
+            if (seats.length === 0) {
+                seatsContainer.innerHTML += '<p>暂无可用座位</p>';
+                return;
+            }
+
+            const seatsList = document.createElement('div');
+            seatsList.className = 'seats-list';
+
+            seats.forEach(seat => {
+                const seatItem = document.createElement('div');
+                seatItem.className = `seat-item ${seat.status.toLowerCase()}`;
+                
+                seatItem.innerHTML = `
+                    <div>
+                        <strong>座位号: ${seat.id}</strong><br>
+                        位置: ${seat.location}<br>
+                        状态: ${getStatusText(seat.status)}
+                    </div>
+                    ${seat.status === 'AVAILABLE' ? '<button class="reserve-seat-btn">预约</button>' : ''}
+                `;
+                
+                seatsList.appendChild(seatItem);
+                
+                // 添加预约按钮事件
+                const reserveBtn = seatItem.querySelector('.reserve-seat-btn');
+                if (reserveBtn) {
+                    reserveBtn.addEventListener('click', () => {
+                        document.getElementById('seatId').value = seat.id;
+                        reservationForm.style.display = 'block';
+                    });
+                }
+            });
+
+            seatsContainer.appendChild(seatsList);
+        }
+
+        // 获取状态文本
+        function getStatusText(status) {
+            switch (status) {
+                case 'AVAILABLE': return '可用';
+                case 'OCCUPIED': return '已占用';
+                case 'MAINTENANCE': return '维护中';
+                default: return status;
+            }
+        }
+
+        // 预约座位
+        document.getElementById('reserveBtn').addEventListener('click', async () => {
+            const seatId = document.getElementById('seatId').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+
+            if (!seatId || !startTime || !endTime) {
+                showMessage('请填写所有预约信息', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/reservations?seatId=${seatId}&username=${currentUser}&startTime=${startTime}&endTime=${endTime}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    showMessage('预约成功');
+                    reservationForm.style.display = 'none';
+                    loadSeats();
+                    loadUserReservations();
+                } else {
+                    const error = await response.text();
+                    showMessage(error, true);
+                }
+            } catch (error) {
+                showMessage('预约失败，请稍后再试', true);
+                console.error('预约错误:', error);
+            }
+        });
+
+        // 取消预约表单
+        document.getElementById('cancelReserveBtn').addEventListener('click', () => {
+            reservationForm.style.display = 'none';
+        });
+
+        // 加载用户预约
+        async function loadUserReservations() {
+            if (!token || !currentUser) return;
+
+            try {
+                const response = await fetch(`/api/reservations/user/${currentUser}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const reservations = await response.json();
+                    displayUserReservations(reservations);
+                } else {
+                    showMessage('获取预约信息失败', true);
+                }
+            } catch (error) {
+                console.error('加载预约错误:', error);
+            }
+        }
+
+        // 显示用户预约
+        function displayUserReservations(reservations) {
+            const reservationsList = document.getElementById('reservationsList');
+            reservationsList.innerHTML = '';
+            
+            if (reservations.length === 0) {
+                reservationsList.innerHTML = '<p>暂无预约记录</p>';
+            } else {
+                reservations.forEach(reservation => {
+                    const item = document.createElement('div');
+                    item.className = 'seat-item';
+                    
+                    const startTime = new Date(reservation.startTime).toLocaleString();
+                    const endTime = new Date(reservation.endTime).toLocaleString();
+                    
+                    item.innerHTML = `
+                        <div>
+                            <strong>座位号: ${reservation.seatId}</strong><br>
+                            开始时间: ${startTime}<br>
+                            结束时间: ${endTime}<br>
+                            状态: ${getReservationStatusText(reservation.status)}
+                        </div>
+                        ${reservation.status === 'ACTIVE' ? '<button class="cancel-reservation-btn" data-id="' + reservation.id + '">取消预约</button>' : ''}
+                    `;
+                    
+                    reservationsList.appendChild(item);
+                    
+                    // 添加取消预约按钮事件
+                    const cancelBtn = item.querySelector('.cancel-reservation-btn');
+                    if (cancelBtn) {
+                        cancelBtn.addEventListener('click', async (e) => {
+                            const reservationId = e.target.getAttribute('data-id');
+                            await cancelReservation(reservationId);
+                        });
+                    }
+                });
+            }
+            
+            userReservations.classList.remove('hidden');
+        }
+
+        // 获取预约状态文本
+        function getReservationStatusText(status) {
+            switch (status) {
+                case 'ACTIVE': return '生效中';
+                case 'CANCELLED': return '已取消';
+                case 'COMPLETED': return '已完成';
+                default: return status;
+            }
+        }
+
+        // 取消预约
+        async function cancelReservation(reservationId) {
+            try {
+                const response = await fetch(`/api/reservations/${reservationId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    showMessage('预约已取消');
+                    loadUserReservations();
+                    loadSeats();
+                } else {
+                    const error = await response.text();
+                    showMessage(error, true);
+                }
+            } catch (error) {
+                showMessage('取消预约失败，请稍后再试', true);
+                console.error('取消预约错误:', error);
+            }
+        }
+    </script>
+</body>
+</html>
