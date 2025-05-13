@@ -6,6 +6,11 @@ import com.library.mapper.UserMapper;
 import com.library.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import java.util.Date;
 import java.util.List;
@@ -41,7 +46,15 @@ public class UserServiceImpl implements UserService {
         ApiResult r = ApiResult.error("登录失败");
         User user = userMapper.login(username, password);
         if (user != null) {
-            r = ApiResult.ok(user);
+            // 获取当前请求的HttpServletRequest
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
+                HttpServletRequest request = attributes.getRequest();
+                // 获取session并存储用户信息
+                HttpSession session = request.getSession();
+                session.setAttribute("loginUser", user);
+            }
+            r = ApiResult.loginSuccess(user);
         } else {
             r = ApiResult.error("用户名或密码错误");
         }
