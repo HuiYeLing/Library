@@ -16,7 +16,14 @@ const currentFloor = ref('First Floor')
 // 添加详情卡片状态
 const selectedSeat = ref(null)
 const showSeatDetail = ref(false)
-
+// 跳转到个人信息页面
+const goToProfile = () => {
+  // 检查用户是否登录
+  if (!checkAuth()) return
+  
+  // 导航到个人信息页面
+  router.push('/profile')
+}
 // 显示座位详情
 const viewSeatDetail = (seat) => {
   selectedSeat.value = seat
@@ -186,6 +193,10 @@ onMounted(() => {
         <button class="refresh-btn" @click="fetchSeats" :disabled="loading">
           {{ loading ? '更新中' : '刷新状态' }}
         </button>
+
+        <button class="refresh-btn" @click="goToProfile">
+  个人信息
+</button>
       </div>
     </header>
     
@@ -267,7 +278,7 @@ onMounted(() => {
 </template>
 
 <style>
-/* 添加详情卡片样式 */
+/* 添加详情卡片样式 (不知名原因必须留在这边)*/
 .seat-detail-modal {
   position: fixed;
   top: 0;
