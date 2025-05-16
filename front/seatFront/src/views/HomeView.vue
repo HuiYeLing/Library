@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import '../css/HomeView.css'
 import '../css/global.css'
 
+
 const router = useRouter()
 const seats = ref([])
 const loading = ref(false)
@@ -12,6 +13,20 @@ const error = ref('')
 const successMessage = ref('')
 // 添加当前楼层状态
 const currentFloor = ref('First Floor')
+// 添加详情卡片状态
+const selectedSeat = ref(null)
+const showSeatDetail = ref(false)
+
+// 显示座位详情
+const viewSeatDetail = (seat) => {
+  selectedSeat.value = seat
+  showSeatDetail.value = true
+}
+
+// 关闭座位详情
+const closeSeatDetail = () => {
+  showSeatDetail.value = false
+}
 
 // 按楼层分组的座位
 const firstFloorSeats = computed(() => {
@@ -74,9 +89,9 @@ const reserveSeat = async (seatId) => {
   successMessage.value = ''
   
   try {
-    const response = await axios.get('/api/seats/reserveSeat', {
-      params: { id: seatId }
-    })
+  const response = await axios.get('/api/seats/reserveSeat', {
+    params: { id: seatId }
+  })
     
     if (response.data.code === 200) {
       successMessage.value = '座位预订成功!'
@@ -209,26 +224,129 @@ onMounted(() => {
           :class="['seat', seat.status.toLowerCase(), `seat-${seat.seat_number.toLowerCase()}`]"
         >
           <div class="seat-content">
-      <div class="seat-number">{{ seat.seat_number }}</div>
-      <div class="seat-status">{{ seat.status === 'OCCUPIED' ? '已占用' : '可预订' }}</div>
-      <button 
-        v-if="seat.status === 'AVAILABLE'" 
-        @click="reserveSeat(seat.id)"
-        class="seat-action reserve">
-        预订
-      </button>
-      <button 
-        v-else-if="seat.status === 'OCCUPIED'" 
-        @click="leaveSeat(seat.id)"
-        class="seat-action leave">
-        结束使用
-      </button>
-      </div>
-
+            <div class="seat-number">{{ seat.seat_number }}</div>
+            <div class="seat-status">{{ seat.status === 'OCCUPIED' ? '已占用' : '可预订' }}</div>
+            <button 
+              v-if="seat.status === 'AVAILABLE'" 
+              @click="viewSeatDetail(seat)"
+              class="seat-action reserve">
+              查看
+            </button>
+            <button 
+              v-else-if="seat.status === 'OCCUPIED'" 
+              @click="leaveSeat(seat.id)"
+              class="seat-action leave">
+              结束使用
+            </button>
+          </div>
         </div>
       </div>
-      
-      
+    </div>
+    
+    <!-- 座位详情弹窗 -->
+    <div v-if="showSeatDetail" class="seat-detail-modal">
+      <div class="seat-detail-card">
+        <button class="close-button" @click="closeSeatDetail">×</button>
+        <h3>座位详情</h3>
+        <div v-if="selectedSeat" class="seat-info">
+          <p><strong>座位编号:</strong> {{ selectedSeat.seat_number }}</p>
+          <p><strong>位置:</strong> {{ selectedSeat.location === 'First Floor' ? '一楼阅览区' : '二楼自习区' }}</p>
+          <p><strong>状态:</strong> {{ selectedSeat.status === 'OCCUPIED' ? '已占用' : '可预订' }}</p>
+          <div class="detail-actions">
+            <button 
+              v-if="selectedSeat.status === 'AVAILABLE'"
+              @click="reserveSeat(selectedSeat.id); closeSeatDetail()"
+              class="reserve-btn">
+              预订此座位
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
+
+<style>
+/* 添加详情卡片样式 */
+.seat-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.seat-detail-card {
+  background-color: #323742;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  width: 320px;
+  position: relative;
+  border: 1px solid #3c4150;
+  color: #e8eaed;
+}
+
+.close-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #adb5bd;
+}
+
+.close-button:hover {
+  color: #e8eaed;
+}
+
+.seat-detail-card h3 {
+  color: #e8eaed;
+  border-bottom: 1px solid #3c4150;
+  padding-bottom: 10px;
+  margin-top: 0;
+}
+
+.seat-info {
+  margin-top: 15px;
+}
+
+.seat-info p {
+  margin: 12px 0;
+  color: #adb5bd;
+}
+
+.seat-info p strong {
+  color: #e8eaed;
+}
+
+.detail-actions {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.reserve-btn {
+  background-color: #7B97FC;
+  color: #1a1d24;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  transition: all 0.3s;
+}
+
+.reserve-btn:hover {
+  background-color: #96ACFD;
+  box-shadow: 0 2px 10px rgba(123, 151, 252, 0.3);
+}
+</style>
