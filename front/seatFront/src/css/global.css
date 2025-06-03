@@ -9,7 +9,8 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
-  background-color: #282c34;
+  background-color: #f5f5f5; /* 淡灰色背景 */
+  color: #333; /* 深色文本提高可读性 */
   overflow-x: hidden; /* 防止水平滚动条 */
 }
 
@@ -28,8 +29,10 @@ html, body {
   max-width: 1200px; /* 限制最大宽度 */
   margin: 0 auto;
   padding: 1rem 2rem;
-  background-color: #282c34; /* 保持与背景一致 */
-  color: #e8eaed;
+  background-color: #f8f9fa; /* 稍微深一点的背景色 */
+  color: #333;
+  border-radius: 12px; /* 圆角增加视觉区分 */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.03); /* 非常柔和的阴影 */
 }
 
 /* 在小屏幕设备上减小内边距 */

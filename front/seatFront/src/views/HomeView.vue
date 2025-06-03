@@ -20,7 +20,7 @@ const showSeatDetail = ref(false)
 const goToProfile = () => {
   // 检查用户是否登录
   if (!checkAuth()) return
-  
+
   // 导航到个人信息页面
   router.push('/profile')
 }
@@ -71,7 +71,7 @@ const checkAuth = () => {
 const fetchSeats = async () => {
   loading.value = true
   error.value = ''
-  
+
   try {
     const response = await axios.get('/api/seats/getListSeats')
     if (response.data.code === 200) {
@@ -90,16 +90,16 @@ const fetchSeats = async () => {
 // 预订座位
 const reserveSeat = async (seatId) => {
   if (!checkAuth()) return
-  
+
   loading.value = true
   error.value = ''
   successMessage.value = ''
-  
+
   try {
-  const response = await axios.get('/api/seats/reserveSeat', {
-    params: { id: seatId }
-  })
-    
+    const response = await axios.get('/api/seats/reserveSeat', {
+      params: { id: seatId }
+    })
+
     if (response.data.code === 200) {
       successMessage.value = '座位预订成功!'
       // 刷新座位列表
@@ -118,16 +118,16 @@ const reserveSeat = async (seatId) => {
 // 离开座位
 const leaveSeat = async (seatId) => {
   if (!checkAuth()) return
-  
+
   loading.value = true
   error.value = ''
   successMessage.value = ''
-  
+
   try {
     const response = await axios.get('/api/seats/leaveSeat', {
       params: { id: seatId }
     })
-    
+
     if (response.data.code === 200) {
       successMessage.value = '已成功离开座位!'
       // 刷新座位列表
@@ -195,29 +195,25 @@ onMounted(() => {
         </button>
 
         <button class="refresh-btn" @click="goToProfile">
-  个人信息
-</button>
+          个人信息
+        </button>
       </div>
     </header>
-    
+
     <div v-if="error" class="error-message">{{ error }}</div>
     <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
-    
+
     <div v-if="loading" class="loading-overlay">
       <div class="loading-spinner"></div>
       <p>加载中，请稍候...</p>
     </div>
-    
+
     <!-- 楼层切换菜单 -->
     <div class="floor-tabs">
-      <button 
-        :class="['floor-tab', { active: currentFloor === 'First Floor' }]"
-        @click="switchFloor('First Floor')">
+      <button :class="['floor-tab', { active: currentFloor === 'First Floor' }]" @click="switchFloor('First Floor')">
         一楼
       </button>
-      <button 
-        :class="['floor-tab', { active: currentFloor === 'Second Floor' }]"
-        @click="switchFloor('Second Floor')">
+      <button :class="['floor-tab', { active: currentFloor === 'Second Floor' }]" @click="switchFloor('Second Floor')">
         二楼
       </button>
     </div>
@@ -227,33 +223,24 @@ onMounted(() => {
       <h2 class="floor-title">
         {{ currentFloor === 'First Floor' ? '一楼阅览区' : '二楼自习区' }}
       </h2>
-      
+
       <div class="seat-matrix">
-        <div 
-          v-for="seat in currentSeats" 
-          :key="seat.id"
-          :class="['seat', seat.status.toLowerCase(), `seat-${seat.seat_number.toLowerCase()}`]"
-        >
+        <div v-for="seat in currentSeats" :key="seat.id"
+          :class="['seat', seat.status.toLowerCase(), `seat-${seat.seat_number.toLowerCase()}`]">
           <div class="seat-content">
             <div class="seat-number">{{ seat.seat_number }}</div>
             <div class="seat-status">{{ seat.status === 'OCCUPIED' ? '已占用' : '可预订' }}</div>
-            <button 
-              v-if="seat.status === 'AVAILABLE'" 
-              @click="viewSeatDetail(seat)"
-              class="seat-action reserve">
+            <button v-if="seat.status === 'AVAILABLE'" @click="viewSeatDetail(seat)" class="seat-action reserve">
               查看
             </button>
-            <button 
-              v-else-if="seat.status === 'OCCUPIED'" 
-              @click="leaveSeat(seat.id)"
-              class="seat-action leave">
+            <button v-else-if="seat.status === 'OCCUPIED'" @click="leaveSeat(seat.id)" class="seat-action leave">
               结束使用
             </button>
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- 座位详情弹窗 -->
     <div v-if="showSeatDetail" class="seat-detail-modal">
       <div class="seat-detail-card">
@@ -264,9 +251,7 @@ onMounted(() => {
           <p><strong>位置:</strong> {{ selectedSeat.location === 'First Floor' ? '一楼阅览区' : '二楼自习区' }}</p>
           <p><strong>状态:</strong> {{ selectedSeat.status === 'OCCUPIED' ? '已占用' : '可预订' }}</p>
           <div class="detail-actions">
-            <button 
-              v-if="selectedSeat.status === 'AVAILABLE'"
-              @click="reserveSeat(selectedSeat.id); closeSeatDetail()"
+            <button v-if="selectedSeat.status === 'AVAILABLE'" @click="reserveSeat(selectedSeat.id); closeSeatDetail()"
               class="reserve-btn">
               预订此座位
             </button>
@@ -285,7 +270,7 @@ onMounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(149, 145, 145, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -293,14 +278,14 @@ onMounted(() => {
 }
 
 .seat-detail-card {
-  background-color: #323742;
+  background-color: #ffffff;
   padding: 25px;
   border-radius: 8px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
   width: 320px;
   position: relative;
   border: 1px solid #3c4150;
-  color: #e8eaed;
+
 }
 
 .close-button {
@@ -319,7 +304,7 @@ onMounted(() => {
 }
 
 .seat-detail-card h3 {
-  color: #e8eaed;
+  color: #000000;
   border-bottom: 1px solid #3c4150;
   padding-bottom: 10px;
   margin-top: 0;
@@ -331,11 +316,11 @@ onMounted(() => {
 
 .seat-info p {
   margin: 12px 0;
-  color: #adb5bd;
+  color: #000000;
 }
 
 .seat-info p strong {
-  color: #e8eaed;
+  color: #000000;
 }
 
 .detail-actions {

@@ -4,9 +4,11 @@ import com.library.domain.Seats;
 import com.library.domain.User;
 import com.library.entity.vo.ApiResult;
 import com.library.mapper.SeatsMapper;
+import com.library.service.ReservationService;
 import com.library.service.SeatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -54,39 +56,33 @@ public class SeatsServiceImpl implements SeatsService {
         }
         return r;
     }
-    
+
+    @Autowired
+    private ReservationService reservationService;
+
     @Override
+    @Transactional
     public ApiResult reserveSeat(long id) {
-        // 获取当前登录用户
         User loginUser = getCurrentLoginUser();
         if (loginUser == null) {
             return ApiResult.noauth("请先登录");
         }
-        
-        // 先查询座位是否存在
         Seats seat = seatsMapper.getSeatById(id);
-
         if (seat == null) {
             return ApiResult.error("座位不存在");
         }
-
-        // 检查座位状态是否为可用
         if (!Seats.STATUS_AVAILABLE.equals(seat.getStatus())) {
             return ApiResult.error("座位不可用，当前状态：" + seat.getStatus());
         }
-
-        // 更新座位状态为已占用
         int result = seatsMapper.updateSeatStatus(id, Seats.STATUS_OCCUPIED);
-
         if (result > 0) {
-            // 获取更新后的座位信息
-            seat = seatsMapper.getSeatById(id);
-            
-            // TODO: 创建预约记录，关联用户ID和座位ID
-            // 这里需要调用预约服务创建预约记录
-            // reservationService.createReservation(loginUser.getId(), id);
-            
-            return ApiResult.ok(seat, "预定座位成功");
+            int insert = reservationService.createReservation(loginUser.getId(), id);
+            if (insert > 0) {
+                seat = seatsMapper.getSeatById(id);
+                return ApiResult.ok(seat, "预定座位成功");
+            } else {
+                throw new RuntimeException("预约记录写入失败");
+            }
         } else {
             return ApiResult.error("预定座位失败，请稍后再试");
         }
