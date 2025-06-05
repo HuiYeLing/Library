@@ -20,7 +20,19 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
+    // 判断当前用户是否为管理员
+    private boolean isAdmin() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) return false;
+        HttpServletRequest request = attributes.getRequest();
+        HttpSession session = request.getSession(false);
+        if (session == null) return false;
+        User user = (User) session.getAttribute("loginUser");
+        return user != null && "admin".equals(user.getRole());
+    }
+
     public ApiResult getUserById(long id) {
+        if (!isAdmin()) return ApiResult.error("无权限操作");
         ApiResult r = ApiResult.error("获取用户失败");
         User user = userMapper.getUserById(id);
         if (user != null) {
@@ -32,6 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public ApiResult getUserByUsername(String username) {
+        if (!isAdmin()) return ApiResult.error("无权限操作");
         ApiResult r = ApiResult.error("获取用户失败");
         User user = userMapper.getUserByUsername(username);
         if (user != null) {
@@ -76,7 +89,9 @@ public class UserServiceImpl implements UserService {
         }
         return r;
     }
+
     public ApiResult deleteUser(long id) {
+        if (!isAdmin()) return ApiResult.error("无权限操作");
         ApiResult r = ApiResult.error("删除用户失败");
         int result = userMapper.deleteUser(id);
         if (result > 0) {
@@ -86,7 +101,9 @@ public class UserServiceImpl implements UserService {
         }
         return r;
     }
+
     public ApiResult getAllUsers() {
+        if (!isAdmin()) return ApiResult.error("无权限操作");
         ApiResult r = ApiResult.error("获取所有用户失败");
         List<User> users = userMapper.getAllUsers();
         if (users != null && !users.isEmpty()) {
@@ -96,7 +113,9 @@ public class UserServiceImpl implements UserService {
         }
         return r;
     }
+
     public ApiResult insertUser(String username, String password, String email, String created_at) {
+        if (!isAdmin()) return ApiResult.error("无权限操作");
         ApiResult r = ApiResult.error("插入用户失败");
         User user = new User();
         user.setUsername(username);
@@ -110,8 +129,5 @@ public class UserServiceImpl implements UserService {
             r = ApiResult.error("插入用户失败");
         }
         return r;
+    }
 }
-}
-
-
-

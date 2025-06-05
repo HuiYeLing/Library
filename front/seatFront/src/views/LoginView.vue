@@ -43,7 +43,7 @@ const handleLogin = async () => {
   loginError.value = ''
   
   try {
-    // 修改为使用params发送参数
+    // 使用params发送参数
     const response = await axios.post('/api/user/login', null, {
       params: {
         username: loginForm.value.username,
@@ -55,12 +55,15 @@ const handleLogin = async () => {
     if (response.data.code === 200) {
       // 登录成功，保存token
       localStorage.setItem('token', response.data.data.token)
-      
-      // 可以在全局状态或Pinia/Vuex中保存用户登录状态
-      console.log('登录成功，token:', response.data.data.token)
-      
-      // 跳转到仪表盘页面
-      router.push('/home')
+      // 保存用户角色
+      localStorage.setItem('role', response.data.data.role)
+
+      // 根据角色跳转
+      if (response.data.data.role === 'admin') {
+        router.push('/admin')
+      } else {
+        router.push('/home')
+      }
     } else {
       // 处理非200状态码
       loginError.value = response.data.message || '登录失败'
