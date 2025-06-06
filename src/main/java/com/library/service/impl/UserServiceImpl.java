@@ -130,4 +130,19 @@ public class UserServiceImpl implements UserService {
         }
         return r;
     }
+    public ApiResult getCurrentUser() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                User user = (User) session.getAttribute("loginUser");
+                if (user != null) {
+                    return ApiResult.ok(user);
+                }
+            }
+        }
+        return ApiResult.noauth("未登录");
+    }
+
 }

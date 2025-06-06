@@ -13,4 +13,6 @@ public interface UserService {
     public ApiResult deleteUser(long id);
     public ApiResult getAllUsers();
     public ApiResult insertUser(String username, String password, String email, String created_at);
+    public ApiResult getCurrentUser(); // 获取当前登录用户信息
+
 }

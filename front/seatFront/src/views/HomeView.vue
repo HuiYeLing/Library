@@ -180,7 +180,7 @@ onMounted(() => {
 <template>
   <div class="library-container">
     <header class="library-header">
-      <h1>图书馆座位预订系统</h1>
+      <h1>自习室管理系统</h1>
       <div class="header-actions">
         <div class="seat-legend">
           <span class="legend-item">

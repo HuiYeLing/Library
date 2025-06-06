@@ -56,4 +56,10 @@ public class UserController {
                                 @RequestParam String email, @RequestParam String created_at) {
         return userService.insertUser(username, password, email, created_at);
     }
+    // 获取当前登录用户信息
+    @GetMapping("/getCurrentUser")
+    public ApiResult getCurrentUser() {
+        return userService.getCurrentUser();
+    }
+
 }

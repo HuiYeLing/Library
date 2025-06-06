@@ -160,8 +160,8 @@ if (response.data.code === 200) {
         </div>
         
         <div class="welcome-text">
-          <h1>图书馆座位管理系统</h1>
-          <p>高效便捷的座位预约平台</p>
+          <h1>自习室管理系统</h1>
+          <p>欢迎使用自习室管理系统</p>
         </div>
         
         <div class="tabs">

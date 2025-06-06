@@ -26,5 +26,8 @@ public interface UserMapper {
     List<User> getAllUsers();
     @Insert("INSERT INTO users (username, password, email, created_at) VALUES (#{username}, #{password}, #{email}, #{created_at})")
     int insertUser(@Param("username") String username, @Param("password") String password, @Param("email") String email, @Param("created_at") String created_at);
-
+    @Select("SELECT * FROM users WHERE id = #{id}")
+    User getCurrentUser(@Param("id") long id); // 获取当前登录用户信息
+    @Update("UPDATE user SET avatar_url = #{avatarUrl} WHERE id = #{userId}")
+    void updateAvatarUrl(@Param("userId") long userId, @Param("avatarUrl") String avatarUrl);
 }
