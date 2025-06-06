@@ -12,6 +12,9 @@ public interface EmployeeMapper {
     Employee getEmployeeById(@Param("id") long id);
 
     @Select("SELECT * FROM employees")
+    @Results({
+            @Result(property = "hireDate", column = "hire_date")
+    })
     List<Employee> getAllEmployees();
 
     @Insert("INSERT INTO employees (name, gender, phone, hire_date, age, salary) VALUES (#{name}, #{gender}, #{phone}, #{hireDate}, #{age}, #{salary})")

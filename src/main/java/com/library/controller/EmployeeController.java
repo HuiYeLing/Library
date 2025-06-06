@@ -24,7 +24,7 @@ public class EmployeeController {
     }
 
     @PostMapping("/add")
-    public ApiResult addEmployee(@ModelAttribute Employee employee) {
+    public ApiResult addEmployee(@RequestBody Employee employee) {
         return employeeService.addEmployee(employee);
     }
 

@@ -175,6 +175,13 @@ onMounted(() => {
   // fetchSeats()
   initializeSeats()
 })
+const goToShop = () => {
+  // 检查用户是否登录
+  if (!checkAuth()) return
+
+  // 导航到个人信息页面
+  router.push('/shop')
+}
 </script>
 
 <template>
@@ -196,6 +203,9 @@ onMounted(() => {
 
         <button class="refresh-btn" @click="goToProfile">
           个人信息
+        </button>
+        <button class="refresh-btn" @click="goToShop">
+          小卖部
         </button>
       </div>
     </header>

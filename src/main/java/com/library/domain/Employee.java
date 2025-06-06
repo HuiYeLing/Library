@@ -12,6 +12,7 @@ public class Employee {
     private String gender;   // 性别
     private String phone;    // 电话号码
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date hireDate;   // 入职日期
     private Integer age;     // 年龄
     private Double salary;   // 工资
