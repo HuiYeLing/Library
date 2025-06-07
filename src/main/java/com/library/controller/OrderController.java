@@ -38,4 +38,14 @@ public class OrderController {
     public ApiResult deleteOrder(@RequestParam Long id) {
         return orderService.deleteOrder(id);
     }
+    // 获取所有订单
+    @GetMapping("/getAll")
+    public ApiResult getAllOrders() {
+        return orderService.getAllOrders();
+    }
+    @PostMapping("/deliver")
+    public ApiResult deliverOrder(@RequestParam Long orderId) {
+        return orderService.updateOrderStatus(orderId, 1);
+    }
+
 }

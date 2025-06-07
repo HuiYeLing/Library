@@ -38,4 +38,15 @@ public class OrderServiceImpl implements OrderService {
         int result = orderMapper.deleteOrderById(id);
         return result > 0 ? ApiResult.ok("订单删除成功") : ApiResult.error("订单删除失败");
     }
+    @Override
+    public ApiResult getAllOrders() {
+        List<Order> orders = orderMapper.selectAllOrders();
+        return ApiResult.ok(orders);
+    }
+
+    @Override
+    public ApiResult updateOrderStatus(Long orderId, Integer status) {
+        int result = orderMapper.updateOrderStatus(orderId, status);
+        return result > 0 ? ApiResult.ok("订单状态更新成功") : ApiResult.error("订单状态更新失败");
+    }
 }

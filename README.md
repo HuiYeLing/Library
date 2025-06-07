@@ -1,105 +1,117 @@
-# 图书馆座位管理系统
+# 自习室管理与小卖部系统
 
-## 系统简介
+## 项目简介
 
-本系统是一个基于Spring Boot开发的图书馆座位管理系统，旨在帮助图书馆实现座位的智能化管理，提高座位资源的利用率，为读者提供便捷的座位预约服务。
+本项目是一个基于 Spring Boot + Vue3 的自习室智能管理系统，集成了自习座位预约、用户管理、商品小卖部、订单管理等功能，适用于高校或公共自习室的数字化管理场景。系统采用前后端分离架构，支持多角色权限，界面简洁，交互友好。
 
-## 系统功能
+---
 
-### 用户管理
+## 功能模块
 
-- 用户注册：新用户可以通过系统注册账号
-- 用户登录：已注册用户可以通过用户名和密码登录系统
-- 用户信息查询：查看用户的基本信息
+### 1. 用户管理
 
-### 座位管理
+- 用户注册/登录：支持新用户注册、已有用户登录，采用 JWT 令牌认证。
+- 用户信息管理：用户可查看和修改个人信息，管理员可管理所有用户。
+- 权限控制：区分普通用户和管理员，部分功能仅管理员可用。
 
-- 座位查询：用户可以查询所有座位、按状态查询座位、按位置查询座位
-- 座位详情：查看特定座位的详细信息
-- 座位状态管理：管理座位的可用状态（可用、已预约、维护中等）
+### 2. 自习座位管理
 
-### 预约管理
+- 座位查询：用户可查看所有自习座位的状态（空闲、已预约、维护中等）。
+- 座位预约：用户可预约指定时间段的座位，支持预约冲突检测。
+- 座位状态管理：管理员可新增、修改、删除座位，调整座位状态。
+- 预约记录：用户可查询、取消自己的预约，管理员可查看所有预约。
 
-- 座位预约：用户可以预约指定时间段的座位
-- 预约查询：用户可以查询自己的预约记录
-- 预约取消：用户可以取消未使用的预约
-- 预约完成：用户使用完座位后可以标记预约为已完成
-- 座位可用性检查：检查特定时间段座位是否可预约
+### 3. 商品小卖部
+
+- 商品浏览：用户可浏览自习室内小卖部的所有商品及库存。
+- 商品购买：用户可直接购买商品，系统自动生成订单并扣减库存。
+- 商品管理：管理员可添加、编辑、删除商品，调整库存和价格。
+
+### 4. 订单管理
+
+- 订单查询：用户可查看自己的订单，管理员可查看所有订单。
+- 订单发货：管理员可将订单状态从“待送”变为“已送达”。
+- 订单删除：管理员可删除订单。
+
+---
 
 ## 技术架构
 
-### 后端技术栈
+### 前端
+
+- 框架：Vue3 + Vite
+- UI：Element Plus（或自定义样式）
+- 路由：Vue Router
+- HTTP请求：Axios
+
+### 后端
 
 - 框架：Spring Boot
 - 安全认证：Spring Security + JWT
-- 数据存储：内存数据结构（实际项目中可替换为数据库）
+- 数据库：MySQL（可扩展为其他数据库）
+- ORM：MyBatis 或 JPA
+- 文件上传：支持商品图片等静态资源上传
 
-### 安全机制
+### 其它
 
-- JWT令牌认证：用户登录后获取JWT令牌，后续请求通过令牌进行身份验证
-- 接口权限控制：部分接口（如登录、注册）允许匿名访问，其他接口需要认证
-- 全局异常处理：统一处理系统异常，提供友好的错误信息
+- 接口文档：详见 `接口文档.md`
+- 示例 SQL 脚本：见 `sql/` 目录
+- 静态资源：商品图片等见 `uploads/` 目录
 
-## API接口说明
+---
 
-### 用户接口
+## 主要数据结构
 
-- POST `/api/users/login`：用户登录
-- POST `/api/users/register`：用户注册
-- GET `/api/users/{username}`：获取用户信息
-- GET `/api/users`：获取所有用户（管理员功能）
+### 用户（User）
 
-### 座位接口
+| 字段     | 类型   | 说明               |
+| -------- | ------ | ------------------ |
+| id       | Long   | 用户ID             |
+| username | String | 用户名             |
+| password | String | 密码（加密）       |
+| email    | String | 邮箱               |
+| role     | String | 角色（user/admin） |
 
-- GET `/api/seats`：获取所有座位
-- GET `/api/seats/{seatId}`：获取特定座位信息
-- GET `/api/seats/status/{status}`：按状态查询座位
-- GET `/api/seats/location/{location}`：按位置查询座位
-- POST `/api/seats`：添加新座位（管理员功能）
-- PUT `/api/seats/{seatId}`：更新座位信息（管理员功能）
-- DELETE `/api/seats/{seatId}`：删除座位（管理员功能）
+### 座位（Seat）
 
-### 预约接口
+| 字段     | 类型   | 说明                         |
+| -------- | ------ | ---------------------------- |
+| id       | Long   | 座位ID                       |
+| status   | String | 状态（空闲、已预约、维护中） |
+| location | String | 位置描述                     |
 
-- GET `/api/reservations`：获取所有预约记录（管理员功能）
-- GET `/api/reservations/{reservationId}`：获取特定预约详情
-- GET `/api/reservations/user/{username}`：获取用户的预约记录
-- POST `/api/reservations`：创建新预约
-- DELETE `/api/reservations/{reservationId}`：取消预约
-- PUT `/api/reservations/{reservationId}/complete`：完成预约
-- GET `/api/reservations/check-availability`：检查座位在特定时间段是否可用
+### 预约（Reservation）
 
-## 使用说明
+| 字段      | 类型     | 说明                           |
+| --------- | -------- | ------------------------------ |
+| id        | Long     | 预约ID                         |
+| userId    | Long     | 用户ID                         |
+| seatId    | Long     | 座位ID                         |
+| startTime | DateTime | 开始时间                       |
+| endTime   | DateTime | 结束时间                       |
+| status    | String   | 状态（已预约、已完成、已取消） |
 
-### 系统启动
+### 商品（Product）
 
-1. 确保已安装Java 8或更高版本
-2. 使用Maven构建项目：`mvn clean package`
-3. 运行生成的JAR文件：`java -jar target/library-0.0.1-SNAPSHOT.jar`
-4. 系统默认在8080端口启动
+| 字段     | 类型    | 说明     |
+| -------- | ------- | -------- |
+| id       | Long    | 商品ID   |
+| name     | String  | 商品名称 |
+| price    | Double  | 商品价格 |
+| stock    | Integer | 库存     |
+| imageUrl | String  | 图片路径 |
 
-### 接口调用示例
+### 订单（Order）
 
-#### 用户登录
+| 字段        | 类型     | 说明                   |
+| ----------- | -------- | ---------------------- |
+| id          | Long     | 订单ID                 |
+| userId      | Long     | 用户ID                 |
+| username    | String   | 用户名                 |
+| productId   | Long     | 商品ID                 |
+| productName | String   | 商品名称               |
+| totalPrice  | Double   | 总价                   |
+| createTime  | DateTime | 下单时间               |
+| status      | Integer  | 状态（0待送，1已送达） |
 
-```
-POST /api/users/login?username=student1&password=password
-```
-
-响应：
-
-```json
-{
-  "message": "登录成功",
-  "username": "student1",
-  "name": "张三",
-  "token": "eyJhbGciOiJIUzI1NiJ9..."
-}
-```
-
-#### 预约座位
-
-```
-POST /api/reservations?seatId=1&username=student1&startTime=2023-06-01T09:00:00&endTime=2023-06-01T12:00:00
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
-```
+---

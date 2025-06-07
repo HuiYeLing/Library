@@ -8,4 +8,6 @@ public interface OrderService {
     ApiResult getOrderById(Long id);
     ApiResult getOrdersByUserId(Long userId);
     ApiResult deleteOrder(Long id);
+    ApiResult getAllOrders();
+    ApiResult updateOrderStatus(Long orderId, Integer status);
 }

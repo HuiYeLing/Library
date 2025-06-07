@@ -57,7 +57,8 @@ const handleLogin = async () => {
       localStorage.setItem('token', response.data.data.token)
       // 保存用户角色
       localStorage.setItem('role', response.data.data.role)
-
+ // 保存用户id
+ localStorage.setItem('userId', response.data.data.id)
       // 根据角色跳转
       if (response.data.data.role === 'admin') {
         router.push('/admin')

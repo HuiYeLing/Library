@@ -11,8 +11,20 @@ public class Order {
     private String productName;   // 产品名称
     private BigDecimal totalPrice;// 订单总价
     private Date createTime;      // 下单时间
+    private Integer status; // 0-待送, 1-已送达
+
 
     // getter 和 setter 方法
+
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
     public Long getId() {
         return id;
     }
