@@ -154,12 +154,22 @@ if (response.data.code === 200) {
 
 <template>
   <div class="login-container">
+    <!-- 修正视频路径 -->
+    <video 
+      class="background-video" 
+      autoplay 
+      muted 
+      loop 
+      playsinline
+    >
+      <source src="/sakura.mp4" type="video/mp4">
+      您的浏览器不支持视频播放
+    </video>
+    <!-- 视频遮罩层 -->
+    <div class="video-overlay"></div>
+    
     <div class="login-wrapper">
       <div class="form-container">
-        <div class="logo">
-          <div class="logo-icon">LS</div>
-        </div>
-        
         <div class="welcome-text">
           <h1>自习室管理系统</h1>
           <p>欢迎使用自习室管理系统</p>
@@ -170,40 +180,53 @@ if (response.data.code === 200) {
             :class="['tab-btn', { active: activeTab === 'login' }]" 
             @click="switchTab('login')"
           >
-            登录
+            <span>登录</span>
           </button>
           <button 
             :class="['tab-btn', { active: activeTab === 'register' }]" 
             @click="switchTab('register')"
           >
-            注册
+            <span>注册</span>
           </button>
         </div>
 
         <!-- 登录表单部分 -->
         <div v-if="activeTab === 'login'" class="form login-form">
           <div class="form-group">
-            <label for="username">用户名</label>
-            <input 
-              type="text" 
-              id="username" 
-              v-model="loginForm.username" 
-              placeholder="请输入用户名" 
-              required
-            >
+            <label for="username">
+              <i class="icon">👤</i>
+              用户名
+            </label>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="username" 
+                v-model="loginForm.username" 
+                placeholder="请输入用户名" 
+                required
+              >
+              <div class="input-focus-effect"></div>
+            </div>
           </div>
           <div class="form-group">
-            <label for="password">密码</label>
-            <input 
-              type="password" 
-              id="password" 
-              v-model="loginForm.password" 
-              placeholder="请输入密码" 
-              required
-            >
+            <label for="password">
+              <i class="icon">🔒</i>
+              密码
+            </label>
+            <div class="input-wrapper">
+              <input 
+                type="password" 
+                id="password" 
+                v-model="loginForm.password" 
+                placeholder="请输入密码" 
+                required
+              >
+              <div class="input-focus-effect"></div>
+            </div>
           </div>
           
           <div v-if="loginError" class="error-message">
+            <i class="icon">⚠️</i>
             {{ loginError }}
           </div>
           
@@ -211,78 +234,110 @@ if (response.data.code === 200) {
             class="submit-btn" 
             @click="handleLogin" 
             :disabled="loading">
-            {{ loading ? '登录中...' : '登录' }}
+            <span v-if="!loading">
+              <i class="icon">🚀</i>
+              登录
+            </span>
+            <span v-else class="loading-content">
+              <div class="spinner"></div>
+              登录中...
+            </span>
           </button>
         </div>
 
         <!-- 注册表单 -->
         <div v-if="activeTab === 'register'" class="form register-form">
           <div class="form-group">
-            <label for="reg-username">用户名</label>
-            <input 
-              type="text" 
-              id="reg-username" 
-              v-model="registerForm.username" 
-              placeholder="请创建用户名" 
-              required
-            >
+            <label for="reg-username">
+              <i class="icon">👤</i>
+              用户名
+            </label>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="reg-username" 
+                v-model="registerForm.username" 
+                placeholder="请创建用户名" 
+                required
+              >
+              <div class="input-focus-effect"></div>
+            </div>
           </div>
           <div class="form-group">
-            <label for="email">邮箱</label>
-            <input 
-              type="email" 
-              id="email" 
-              v-model="registerForm.email" 
-              placeholder="请输入邮箱" 
-              required
-            >
+            <label for="email">
+              <i class="icon">📧</i>
+              邮箱
+            </label>
+            <div class="input-wrapper">
+              <input 
+                type="email" 
+                id="email" 
+                v-model="registerForm.email" 
+                placeholder="请输入邮箱" 
+                required
+              >
+              <div class="input-focus-effect"></div>
+            </div>
           </div>
           <div class="form-group">
-            <label for="reg-password">密码</label>
-            <input 
-              type="password" 
-              id="reg-password" 
-              v-model="registerForm.password" 
-              placeholder="请设置密码" 
-              required
-            >
+            <label for="reg-password">
+              <i class="icon">🔒</i>
+              密码
+            </label>
+            <div class="input-wrapper">
+              <input 
+                type="password" 
+                id="reg-password" 
+                v-model="registerForm.password" 
+                placeholder="请设置密码" 
+                required
+              >
+              <div class="input-focus-effect"></div>
+            </div>
           </div>
           <div class="form-group">
-            <label for="confirm-password">确认密码</label>
-            <input 
-              type="password" 
-              id="confirm-password" 
-              v-model="registerForm.confirmPassword" 
-              placeholder="请再次输入密码" 
-              required
-            >
+            <label for="confirm-password">
+              <i class="icon">🔐</i>
+              确认密码
+            </label>
+            <div class="input-wrapper">
+              <input 
+                type="password" 
+                id="confirm-password" 
+                v-model="registerForm.confirmPassword" 
+                placeholder="请再次输入密码" 
+                required
+              >
+              <div class="input-focus-effect"></div>
+            </div>
           </div>
-         <!-- 在注册表单中显示成功信息 -->
-<div v-if="registerSuccess" class="success-message">
-  注册成功！3秒后将自动切换到登录页面...
-</div>
+         <div v-if="registerSuccess" class="success-message">
+           <i class="icon">✅</i>
+           注册成功！3秒后将自动切换到登录页面...
+         </div>
 
-<div v-if="registerError" class="error-message">
-  {{ registerError }}
-</div>
+         <div v-if="registerError" class="error-message">
+           <i class="icon">⚠️</i>
+           {{ registerError }}
+         </div>
           <button 
             class="submit-btn" 
             @click="handleRegister" 
             :disabled="loading"
           >
-            {{ loading ? '注册中...' : '注册' }}
+            <span v-if="!loading">
+              <i class="icon">📝</i>
+              注册
+            </span>
+            <span v-else class="loading-content">
+              <div class="spinner"></div>
+              注册中...
+            </span>
           </button>
         </div>
         
         <div class="footer-text">
           <p>&copy; 2025 图书馆座位管理系统 | 简约·高效</p>
-        </div>
-      </div>
-      
-      <div class="quote-container">
-        <div class="quote">
-          <h2>知识的殿堂</h2>
-          <p>"书籍是人类进步的阶梯"</p>
         </div>
       </div>
     </div>
