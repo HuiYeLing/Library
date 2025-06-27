@@ -249,7 +249,6 @@ if (response.data.code === 200) {
         <div v-if="activeTab === 'register'" class="form register-form">
           <div class="form-group">
             <label for="reg-username">
-              <i class="icon">👤</i>
               用户名
             </label>
             <div class="input-wrapper">
@@ -336,9 +335,7 @@ if (response.data.code === 200) {
           </button>
         </div>
         
-        <div class="footer-text">
-          <p>&copy; 2025 图书馆座位管理系统 | 简约·高效</p>
-        </div>
+        
       </div>
     </div>
   </div>
