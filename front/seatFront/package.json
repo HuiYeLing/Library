@@ -1,4 +1,3 @@
-
 {
   "name": "seatfront",
   "version": "1.0.0",
@@ -9,11 +8,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.3.4"
+    "@mdi/font": "^7.4.47",
+    "axios": "^1.10.0",
+    "vue": "^3.3.4",
+    "vue-router": "^4.5.1",
+    "vuetify": "^3.8.11"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.2.3",
-    "vite": "^4.4.6",
-    "vite-plugin-vue-devtools": "^1.0.0"
+    "@vitejs/plugin-vue": "^4.6.2",
+    "@vue/devtools": "^7.0.0",
+    "vite": "^4.5.14"
   }
 }

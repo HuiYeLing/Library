@@ -182,9 +182,14 @@ const goToShop = () => {
   // 导航到个人信息页面
   router.push('/shop')
 }
+
+const goToAdmin = () => {
+  router.push('/ai')  // 修改为您想要的页面路径
+}
 </script>
 
 <template>
+  
   <div class="library-container">
     <header class="library-header">
       <h1>自习室管理系统</h1>
@@ -266,10 +271,18 @@ const goToShop = () => {
               预订此座位
             </button>
           </div>
+          
         </div>
       </div>
     </div>
   </div>
+
+  <!-- 悬浮球 -->
+    <div class="floating-ball" @click="goToAdmin">
+      <div class="floating-icon">⚙️</div>
+      <div class="floating-text">管理</div>
+    </div>
+ 
 </template>
 
 <style>

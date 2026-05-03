@@ -249,6 +249,7 @@ if (response.data.code === 200) {
         <div v-if="activeTab === 'register'" class="form register-form">
           <div class="form-group">
             <label for="reg-username">
+              <i class="icon">👤</i>
               用户名
             </label>
             <div class="input-wrapper">

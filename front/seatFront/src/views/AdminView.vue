@@ -11,6 +11,7 @@
         <li :class="{active: activeTab==='order'}" @click="activeTab='order'">订单管理</li>
       </ul>
     </aside>
+
     <!-- 右侧内容区 -->
     <main class="main-content">
       <!-- 用户管理 -->
@@ -28,32 +29,36 @@
             {{ loading ? '⏳ 加载中...' : '🔄 刷新列表' }}
           </button>
         </div>
-        <div v-if="filteredUsers.length" class="user-list">
-          <div
-            v-for="user in filteredUsers"
-            :key="user.id"
-            class="user-card"
-            :class="{ expanded: expandedUserId === user.id }"
-          >
-            <div class="user-header" @click="toggleExpand(user.id)">
-              <div>
-                <span class="user-avatar">{{ user.username[0]?.toUpperCase() }}</span>
-                <span class="user-name">{{ user.username }}</span>
-                <span class="user-role" :class="user.role">{{ user.role }}</span>
-              </div>
-              <button class="delete-btn" @click.stop="deleteUser(user.id)">删除</button>
-              <span class="expand-arrow">{{ expandedUserId === user.id ? '▲' : '▼' }}</span>
-            </div>
-            <transition name="fade">
-              <div v-if="expandedUserId === user.id" class="user-detail">
-                <p><b>ID：</b>{{ user.id }}</p>
-                <p><b>用户名：</b>{{ user.username }}</p>
-                <p><b>邮箱：</b>{{ user.email }}</p>
-                <p><b>角色：</b>{{ user.role }}</p>
-              </div>
-            </transition>
-          </div>
+        
+        <div v-if="filteredUsers.length" class="user-table-wrapper">
+          <table class="user-table">
+            <thead>
+              <tr>
+                <th class="text-left">用户头像</th>
+                <th class="text-left">用户名</th>
+                <th class="text-left">邮箱</th>
+                <th class="text-left">角色</th>
+                <th class="text-left">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="user in filteredUsers" :key="user.id" class="user-row">
+                <td>
+                  <span class="user-avatar">{{ user.username[0]?.toUpperCase() }}</span>
+                </td>
+                <td class="user-name">{{ user.username }}</td>
+                <td class="user-email">{{ user.email || '暂无邮箱' }}</td>
+                <td>
+                  <span class="user-role" :class="user.role">{{ user.role }}</span>
+                </td>
+                <td>
+                  <button class="delete-btn" @click="deleteUser(user.id)">删除</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+        
         <div v-else class="empty-tip">暂无用户数据</div>
       </div>
 
@@ -64,7 +69,8 @@
           <input
             v-model="staffSearchText"
             @keyup.enter="searchStaff"
-            placeholder="输入姓名或手机号搜索"/>
+            placeholder="输入姓名或手机号搜索"
+          />
           <button @click="searchStaff" :disabled="staffLoading">🔍 搜索</button>
           <button @click="resetStaffSearch" :disabled="staffLoading">♻️ 重置</button>
           <button @click="showAddStaff = true">新增员工</button>
@@ -72,29 +78,30 @@
             {{ staffLoading ? '⏳ 加载中...' : '🔄 刷新列表' }}
           </button>
         </div>
+        
         <div v-if="filteredStaff.length" class="staff-table-wrapper">
           <table class="staff-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>姓名</th>
-                <th>性别</th>
-                <th>手机号</th>
-                <th>年龄</th>
-                <th>薪资</th>
-                <th>入职日期</th>
-                <th>操作</th>
+                <th class="text-left">ID</th>
+                <th class="text-left">姓名</th>
+                <th class="text-left">性别</th>
+                <th class="text-left">手机号</th>
+                <th class="text-left">年龄</th>
+                <th class="text-left">薪资</th>
+                <th class="text-left">入职日期</th>
+                <th class="text-left">操作</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="staff in filteredStaff" :key="staff.id">
-                <td>{{ staff.id }}</td>
-                <td>{{ staff.name }}</td>
-                <td>{{ staff.gender }}</td>
-                <td>{{ staff.phone }}</td>
-                <td>{{ staff.age }}</td>
-                <td>{{ staff.salary }}</td>
-                <td>{{ formatDate(staff.hireDate) }}</td>
+              <tr v-for="staff in filteredStaff" :key="staff.id" class="staff-row">
+                <td class="staff-id">{{ staff.id }}</td>
+                <td class="staff-name">{{ staff.name }}</td>
+                <td class="staff-gender">{{ staff.gender }}</td>
+                <td class="staff-phone">{{ staff.phone }}</td>
+                <td class="staff-age">{{ staff.age }}</td>
+                <td class="staff-salary">￥{{ staff.salary }}</td>
+                <td class="staff-date">{{ formatDate(staff.hireDate) }}</td>
                 <td>
                   <button class="delete-btn" @click="deleteStaff(staff.id)">删除</button>
                 </td>
@@ -102,6 +109,7 @@
             </tbody>
           </table>
         </div>
+        
         <div v-else class="empty-tip">暂无员工数据</div>
 
         <!-- 新增员工弹窗 -->
@@ -126,41 +134,90 @@
       </div>
 
       <!-- 座位管理 -->
-      <div v-else-if="activeTab==='seat'" class="panel seat-panel">
-        <h2>座位管理</h2>
-        <button class="refresh-btn" @click="fetchSeats" :disabled="seatLoading">
-         {{ seatLoading ? '⏳ 加载中...' : '🔄 刷新座位' }}
-        </button>
-        <div v-if="seats.length" class="seat-grid">
-          <div
-            v-for="seat in seats"
-            :key="seat.id"
-            class="seat-item"
-            :class="seatStatusClass(seat.status)"
-          >
-            <div class="seat-id">#{{ seat.id }}</div>
-            <div class="seat-status">{{ seat.status }}</div>
-            <div class="seat-actions">
-              <button
-                v-if="seat.status === '空闲'"
-                @click="updateSeatStatus(seat.id, '已预订')"
-                :disabled="seatLoading"
-              >预订</button>
-              <button
-                v-if="seat.status === '已预订'"
-                @click="updateSeatStatus(seat.id, '空闲')"
-                :disabled="seatLoading"
-              >释放</button>
-              <button
-                v-if="seat.status !== '空闲' && seat.status !== '已预订'"
-                @click="updateSeatStatus(seat.id, '空闲')"
-                :disabled="seatLoading"
-              >重置</button>
-            </div>
+<div v-else-if="activeTab==='seat'" class="panel seat-panel">
+  <h2>座位管理</h2>
+  <div class="search-bar">
+    <button class="refresh-btn" @click="fetchSeats" :disabled="seatLoading">
+      {{ seatLoading ? '⏳ 加载中...' : '🔄 刷新座位' }}
+    </button>
+    <button @click="resetAllSeats" :disabled="seatLoading" class="reset-all-btn">
+      🔄 重置所有座位
+    </button>
+    <div class="seat-stats">
+      <span class="stat-item">
+        总座位: {{ seats.length }}
+      </span>
+      <span class="stat-item available">
+        空闲: {{ availableSeatsCount }}
+      </span>
+      <span class="stat-item occupied">
+        已预订: {{ occupiedSeatsCount }}
+      </span>
+    </div>
+  </div>
+  
+  <div v-if="seats.length" class="seat-grid">
+    <div
+      v-for="seat in seats"
+      :key="seat.id"
+      class="seat-card"
+      :class="seatStatusClass(seat.status)"
+    >
+      <div class="seat-header">
+        <div class="seat-number">#{{ seat.id }}</div>
+        <div class="seat-status-badge" :class="seatStatusClass(seat.status)">
+          {{ getStatusText(seat.status) }}
+        </div>
+      </div>
+      
+      <div class="seat-body">
+        <div class="seat-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="currentColor">
+            <path d="M8 18h24v2H8v-2zm2-8h20c1.1 0 2 .9 2 2v4H8v-4c0-1.1.9-2 2-2zm0 16h20c1.1 0 2 .9 2 2v4H8v-4c0-1.1.9-2 2-2z"/>
+          </svg>
+        </div>
+        <div class="seat-info">
+          <div class="seat-title">座位 {{ seat.id }}</div>
+          <div class="seat-subtitle">
+            状态：<span class="status-text" :class="seatStatusClass(seat.status)">{{ getStatusText(seat.status) }}</span>
           </div>
         </div>
-        <div v-else class="empty-tip">暂无座位数据</div>
       </div>
+      
+      <div class="seat-actions">
+        <button
+          v-if="seat.status === '空闲' || seat.status === 'AVAILABLE'"
+          class="action-btn reserve-btn"
+          @click="updateSeatStatus(seat.id, 'OCCUPIED')"
+          :disabled="seatLoading"
+        >
+          <span class="btn-icon">📋</span>
+          预订
+        </button>
+        <button
+          v-if="seat.status === '已预订' || seat.status === 'OCCUPIED'"
+          class="action-btn release-btn"
+          @click="updateSeatStatus(seat.id, 'AVAILABLE')"
+          :disabled="seatLoading"
+        >
+          <span class="btn-icon">🔓</span>
+          释放
+        </button>
+        <button
+          v-if="seat.status !== '空闲' && seat.status !== '已预订' && seat.status !== 'AVAILABLE' && seat.status !== 'OCCUPIED'"
+          class="action-btn reset-btn"
+          @click="updateSeatStatus(seat.id, 'AVAILABLE')"
+          :disabled="seatLoading"
+        >
+          <span class="btn-icon">🔄</span>
+          重置
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div v-else class="empty-tip">暂无座位数据</div>
+</div>
 
       <!-- 商品管理 -->
       <div v-else-if="activeTab==='product'" class="panel product-panel">
@@ -174,6 +231,7 @@
             {{ productLoading ? '⏳ 加载中...' : '🔄 刷新列表' }}
           </button>
         </div>
+        
         <div v-if="filteredProducts.length" class="product-card-list">
           <div class="product-card" v-for="product in filteredProducts" :key="product.id">
             <div class="product-title">{{ product.name }}</div>
@@ -186,7 +244,9 @@
             </div>
           </div>
         </div>
+        
         <div v-else class="empty-tip">暂无商品数据</div>
+
         <!-- 新增/编辑商品弹窗 -->
         <div v-if="showAddProduct" class="modal">
           <div class="modal-content">
@@ -205,58 +265,60 @@
       </div>
 
       <!-- 订单管理 -->
-<div v-else-if="activeTab==='order'" class="panel order-panel">
-  <h2>订单管理</h2>
-  <div class="search-bar">
-    <input v-model="orderSearchText" placeholder="输入用户ID或订单ID搜索" @keyup.enter="searchOrder"/>
-    <button @click="searchOrder" :disabled="orderLoading">🔍 搜索</button>
-    <button @click="resetOrderSearch" :disabled="orderLoading">♻️ 重置</button>
-    <button class="refresh-btn" @click="fetchOrders" :disabled="orderLoading">
-      {{ orderLoading ? '⏳ 加载中...' : '🔄 刷新列表' }}
-    </button>
-  </div>
-  <div v-if="filteredOrders.length" class="order-table-wrapper">
-    <table class="order-card-table">
-      <thead>
-        <tr>
-          <th>订单号</th>
-          <th>用户ID</th>
-          <th>用户名</th>
-          <th>商品ID</th>
-          <th>商品名</th>
-          <th>价格</th>
-          <th>下单时间</th>
-          <th>状态</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="order in filteredOrders" :key="order.id">
-  <td>{{ order.id }}</td>
-  <td>{{ order.userId }}</td>
-  <td>{{ order.username }}</td>
-  <td>{{ order.productId }}</td>
-  <td>{{ order.productName }}</td>
-  <td>￥{{ (!isNaN(Number(order.totalPrice)) && order.totalPrice !== null && order.totalPrice !== '') ? Number(order.totalPrice).toFixed(2) : '0.00' }}</td>
-  <td>{{ order.createTime }}</td>
-  <td>
-    <button
-      :class="{'delivered': order.status == 1}"
-      @click="deliverOrder(order)"
-      :disabled="order.status == 1"
-    >
-      {{ order.status == 1 ? '已送达' : '待送' }}
-    </button>
-  </td>
-  <td>
-    <button class="delete-btn" @click="deleteOrder(order.id)">删除</button>
-  </td>
-</tr>
-      </tbody>
-    </table>
-  </div>
-  <div v-else class="empty-tip">暂无订单数据</div>
-</div>
+      <div v-else-if="activeTab==='order'" class="panel order-panel">
+        <h2>订单管理</h2>
+        <div class="search-bar">
+          <input v-model="orderSearchText" placeholder="输入用户ID或订单ID搜索" @keyup.enter="searchOrder"/>
+          <button @click="searchOrder" :disabled="orderLoading">🔍 搜索</button>
+          <button @click="resetOrderSearch" :disabled="orderLoading">♻️ 重置</button>
+          <button class="refresh-btn" @click="fetchOrders" :disabled="orderLoading">
+            {{ orderLoading ? '⏳ 加载中...' : '🔄 刷新列表' }}
+          </button>
+        </div>
+        
+        <div v-if="filteredOrders.length" class="order-table-wrapper">
+          <table class="order-card-table">
+            <thead>
+              <tr>
+                <th>订单号</th>
+                <th>用户ID</th>
+                <th>用户名</th>
+                <th>商品ID</th>
+                <th>商品名</th>
+                <th>价格</th>
+                <th>下单时间</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="order in filteredOrders" :key="order.id">
+                <td>{{ order.id }}</td>
+                <td>{{ order.userId }}</td>
+                <td>{{ order.username }}</td>
+                <td>{{ order.productId }}</td>
+                <td>{{ order.productName }}</td>
+                <td>￥{{ formatPrice(order.totalPrice) }}</td>
+                <td>{{ order.createTime }}</td>
+                <td>
+                  <button
+                    :class="{'delivered': order.status == 1}"
+                    @click="deliverOrder(order)"
+                    :disabled="order.status == 1"
+                  >
+                    {{ order.status == 1 ? '已送达' : '待送' }}
+                  </button>
+                </td>
+                <td>
+                  <button class="delete-btn" @click="deleteOrder(order.id)">删除</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div v-else class="empty-tip">暂无订单数据</div>
+      </div>
     </main>
   </div>
 </template>
@@ -264,22 +326,40 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
-import "../css/admin.css"
+import "../css/Admin.css"
+
+// API基础配置
 const backendUrl = 'http://localhost:8080'
+
+// 全局状态
+const activeTab = ref('user')
+
+// 用户管理状态
 const users = ref([])
 const loading = ref(false)
 const searchText = ref('')
 const expandedUserId = ref(null)
-const seats = ref([])
-const seatLoading = ref(false)
-const activeTab = ref('user')
 
-// 员工相关
+// 员工管理状态
 const staff = ref([])
 const staffLoading = ref(false)
 const staffSearchText = ref('')
+const showAddStaff = ref(false)
+const newStaff = ref({
+  id: '',
+  name: '',
+  gender: '',
+  phone: '',
+  hireDate: '',
+  age: '',
+  salary: ''
+})
 
-// 商品管理
+// 座位管理状态
+const seats = ref([])
+const seatLoading = ref(false)
+
+// 商品管理状态
 const products = ref([])
 const productLoading = ref(false)
 const productSearchText = ref('')
@@ -287,12 +367,12 @@ const showAddProduct = ref(false)
 const editingProduct = ref(null)
 const productForm = ref({ name: '', price: '', stock: '' })
 
-// 订单管理
+// 订单管理状态
 const orders = ref([])
 const orderLoading = ref(false)
 const orderSearchText = ref('')
 
-// 获取所有用户
+// 用户管理方法
 const fetchUsers = async () => {
   loading.value = true
   try {
@@ -305,7 +385,6 @@ const fetchUsers = async () => {
   }
 }
 
-// 删除用户
 const deleteUser = async (id) => {
   if (!confirm('确定要删除该用户吗？')) return
   loading.value = true
@@ -322,12 +401,6 @@ const deleteUser = async (id) => {
   }
 }
 
-// 展开/收起用户详情
-const toggleExpand = (id) => {
-  expandedUserId.value = expandedUserId.value === id ? null : id
-}
-
-// 搜索用户
 const searchUsers = async () => {
   if (!searchText.value.trim()) {
     await fetchUsers()
@@ -347,23 +420,12 @@ const searchUsers = async () => {
   }
 }
 
-// 重置搜索
 const resetSearch = async () => {
   searchText.value = ''
   await fetchUsers()
 }
 
-// 用户过滤
-const filteredUsers = computed(() => {
-  if (!searchText.value.trim()) return users.value
-  return users.value.filter(
-    u =>
-      u.username.includes(searchText.value.trim()) ||
-      (u.email && u.email.includes(searchText.value.trim()))
-  )
-})
-
-// 获取所有员工
+// 员工管理方法
 const fetchStaff = async () => {
   staffLoading.value = true
   try {
@@ -376,7 +438,6 @@ const fetchStaff = async () => {
   }
 }
 
-// 删除员工
 const deleteStaff = async (id) => {
   if (!confirm('确定要删除该员工吗？')) return
   staffLoading.value = true
@@ -392,38 +453,39 @@ const deleteStaff = async (id) => {
   }
 }
 
-// 搜索员工
+const addStaff = async () => {
+  staffLoading.value = true
+  try {
+    const res = await axios.post('/api/employee/add', newStaff.value)
+    if (res.data.code === 200) {
+      showAddStaff.value = false
+      await fetchStaff()
+      newStaff.value = { id: '', name: '', gender: '', phone: '', hireDate: '', age: '', salary: '' }
+    } else {
+      alert(res.data.msg || '新增失败')
+    }
+  } finally {
+    staffLoading.value = false
+  }
+}
+
 const searchStaff = async () => {
   if (!staffSearchText.value.trim()) {
     await fetchStaff()
     return
   }
-  // 前端过滤
   const keyword = staffSearchText.value.trim()
   staff.value = staff.value.filter(
-    s =>
-      s.name.includes(keyword) ||
-      (s.phone && s.phone.includes(keyword))
+    s => s.name.includes(keyword) || (s.phone && s.phone.includes(keyword))
   )
 }
 
-// 重置员工搜索
 const resetStaffSearch = async () => {
   staffSearchText.value = ''
   await fetchStaff()
 }
 
-// 员工过滤
-const filteredStaff = computed(() => {
-  if (!staffSearchText.value.trim()) return staff.value
-  return staff.value.filter(
-    s =>
-      s.name.includes(staffSearchText.value.trim()) ||
-      (s.phone && s.phone.includes(staffSearchText.value.trim()))
-  )
-})
-
-// 获取所有座位
+// 座位管理方法
 const fetchSeats = async () => {
   seatLoading.value = true
   try {
@@ -436,7 +498,6 @@ const fetchSeats = async () => {
   }
 }
 
-// 更新座位状态
 const updateSeatStatus = async (id, status) => {
   seatLoading.value = true
   try {
@@ -444,7 +505,6 @@ const updateSeatStatus = async (id, status) => {
       params: { id, status }
     })
     if (res.data.code === 200) {
-      // 更新成功后刷新座位列表
       await fetchSeats()
     } else {
       alert(res.data.message || '更新失败')
@@ -454,63 +514,41 @@ const updateSeatStatus = async (id, status) => {
   }
 }
 
-// 状态样式
-const seatStatusClass = (status) => {
-  if (status === '空闲') return 'seat-free'
-  if (status === '已预订') return 'seat-booked'
-  return 'seat-other'
-}
-
-const formatDate = (dateStr) => {
-  if (!dateStr || typeof dateStr !== 'string') return '无'
-  dateStr = dateStr.trim()
-  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-    const [y, m, d] = dateStr.split('-')
-    return `${y}年${parseInt(m)}月${parseInt(d)}日`
-  }
-  const date = new Date(dateStr)
-  if (isNaN(date)) return '无'
-  return date.toLocaleDateString()
-}
-
-onMounted(() => {
-  fetchUsers()
-  fetchSeats()
-  fetchStaff()
-  fetchProducts()
-  fetchOrders()
-})
-
-// 新增员工弹窗相关
-const showAddStaff = ref(false)
-const newStaff = ref({
-  id: '',
-  name: '',
-  gender: '',
-  phone: '',
-  hireDate: '',
-  age: '',
-  salary: ''
-})
-
-const addStaff = async () => {
-  staffLoading.value = true
+// 重置所有座位
+const resetAllSeats = async () => {
+  if (!confirm('确定要重置所有座位为空闲状态吗？')) return
+  seatLoading.value = true
   try {
-    const res = await axios.post('/api/employee/add', newStaff.value)
-    if (res.data.code === 200) {
-      showAddStaff.value = false
-      await fetchStaff()
-      // 清空表单
-      newStaff.value = { id: '', name: '', gender: '', phone: '', hireDate: '', age: '', salary: '' }
-    } else {
-      alert(res.data.msg || '新增失败')
-    }
+    // 批量更新所有座位为AVAILABLE状态
+    const promises = seats.value.map(seat => 
+      axios.get('/api/seats/updateSeatStatus', {
+        params: { id: seat.id, status: 'AVAILABLE' }
+      })
+    )
+    await Promise.all(promises)
+    await fetchSeats()
+    alert('所有座位已重置为空闲状态')
+  } catch (error) {
+    alert('重置失败，请重试')
   } finally {
-    staffLoading.value = false
+    seatLoading.value = false
   }
 }
 
-// 商品管理相关（无图片字段）
+// 计算属性 - 座位统计
+const availableSeatsCount = computed(() => {
+  return seats.value.filter(seat => 
+    seat.status === '空闲' || seat.status === 'AVAILABLE'
+  ).length
+})
+
+const occupiedSeatsCount = computed(() => {
+  return seats.value.filter(seat => 
+    seat.status === '已预订' || seat.status === 'OCCUPIED'
+  ).length
+})
+
+// 商品管理方法
 const fetchProducts = async () => {
   productLoading.value = true
   try {
@@ -609,12 +647,7 @@ const resetProductSearch = () => {
   fetchProducts()
 }
 
-const filteredProducts = computed(() => {
-  if (!productSearchText.value.trim()) return products.value
-  return products.value.filter(p => p.name.includes(productSearchText.value.trim()))
-})
-
-// 订单管理相关
+// 订单管理方法
 const fetchOrders = async () => {
   orderLoading.value = true
   try {
@@ -675,16 +708,6 @@ const resetOrderSearch = async () => {
   await fetchOrders()
 }
 
-const filteredOrders = computed(() => {
-  if (!orderSearchText.value.trim()) return orders.value
-  const keyword = orderSearchText.value.trim()
-  return orders.value.filter(
-    o =>
-      String(o.id).includes(keyword) ||
-      String(o.userId).includes(keyword)
-  )
-})
-
 const deliverOrder = async (order) => {
   if (order.status == 1) return
   const res = await axios.post('/api/order/deliver', null, {
@@ -696,4 +719,83 @@ const deliverOrder = async (order) => {
     alert(res.data.msg || '操作失败')
   }
 }
+
+// 工具函数
+const seatStatusClass = (status) => {
+  if (status === '空闲' || status === 'AVAILABLE') return 'seat-free'
+  if (status === '已预订' || status === 'OCCUPIED') return 'seat-booked'
+  return 'seat-other'
+}
+
+// 状态文本转换函数
+const getStatusText = (status) => {
+  switch (status) {
+    case 'AVAILABLE':
+      return '空闲'
+    case 'OCCUPIED':
+      return '已预订'
+    case '空闲':
+      return '空闲'
+    case '已预订':
+      return '已预订'
+    default:
+      return status
+  }
+}
+
+const formatDate = (dateStr) => {
+  if (!dateStr || typeof dateStr !== 'string') return '无'
+  dateStr = dateStr.trim()
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    const [y, m, d] = dateStr.split('-')
+    return `${y}年${parseInt(m)}月${parseInt(d)}日`
+  }
+  const date = new Date(dateStr)
+  if (isNaN(date)) return '无'
+  return date.toLocaleDateString()
+}
+
+const formatPrice = (price) => {
+  return (!isNaN(Number(price)) && price !== null && price !== '') 
+    ? Number(price).toFixed(2) 
+    : '0.00'
+}
+// 计算属性
+const filteredUsers = computed(() => {
+  if (!searchText.value.trim()) return users.value
+  return users.value.filter(
+    u => u.username.includes(searchText.value.trim()) ||
+         (u.email && u.email.includes(searchText.value.trim()))
+  )
+})
+
+const filteredStaff = computed(() => {
+  if (!staffSearchText.value.trim()) return staff.value
+  return staff.value.filter(
+    s => s.name.includes(staffSearchText.value.trim()) ||
+         (s.phone && s.phone.includes(staffSearchText.value.trim()))
+  )
+})
+
+const filteredProducts = computed(() => {
+  if (!productSearchText.value.trim()) return products.value
+  return products.value.filter(p => p.name.includes(productSearchText.value.trim()))
+})
+
+const filteredOrders = computed(() => {
+  if (!orderSearchText.value.trim()) return orders.value
+  const keyword = orderSearchText.value.trim()
+  return orders.value.filter(
+    o => String(o.id).includes(keyword) || String(o.userId).includes(keyword)
+  )
+})
+
+// 页面初始化
+onMounted(() => {
+  fetchUsers()
+  fetchSeats()
+  fetchStaff()
+  fetchProducts()
+  fetchOrders()
+})
 </script>

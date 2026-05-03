@@ -48,8 +48,8 @@
 
 - 框架：Spring Boot
 - 安全认证：Spring Security + JWT
-- 数据库：MySQL（可扩展为其他数据库）
-- ORM：MyBatis 或 JPA
+- 数据库：MySQL
+- ORM：MyBatis
 - 文件上传：支持商品图片等静态资源上传
 
 ### 其它
