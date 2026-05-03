@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ========== ① 身份证 ========== -->
+    <groupId>com.studyspace</groupId>
+    <artifactId>studyspace-cloud</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>studyspace-cloud</name>
+    <description>自习室管理系统 - Spring Cloud 父工程</description>
+
+    <!-- 父工程不打 jar，只做管理 -->
+    <packaging>pom</packaging>
+
+    <!-- ========== ② 子模块列表（当前先留空，后续逐个添加） ========== -->
+    <modules>
+        <!-- 后续每新建一个子模块就在这里加一行 -->
+        <!-- <module>studyspace-common</module> -->
+        <!-- <module>studyspace-gateway</module> -->
+        <!-- <module>studyspace-auth</module> -->
+        <!-- <module>studyspace-user</module> -->
+        <!-- <module>studyspace-seat</module> -->
+        <!-- <module>studyspace-reservation</module> -->
+        <!-- <module>studyspace-product</module> -->
+        <!-- <module>studyspace-order</module> -->
+    </modules>
+
+    <!-- ========== ③ 统一版本号 ========== -->
+    <properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Spring Boot 版本：沿用你原来的 2.6.13 -->
+        <spring-boot.version>2.6.13</spring-boot.version>
+
+        <!-- Spring Cloud 版本：对应 Spring Boot 2.6.x 的 Hoxton.SR12 或 2021.0.x -->
+        <!-- 这里用 2021.0.9，兼容 Spring Boot 2.6.x -->
+        <spring-cloud.version>2021.0.9</spring-cloud.version>
+
+        <!-- Spring Cloud Alibaba 版本：Nacos、Sentinel 等 -->
+        <spring-cloud-alibaba.version>2021.0.6.1</spring-cloud-alibaba.version>
+
+        <!-- 第三方依赖版本统一管理 -->
+        <mybatis-spring-boot.version>2.2.2</mybatis-spring-boot.version>
+        <mysql-connector.version>8.0.33</mysql-connector.version>
+        <jjwt.version>0.9.1</jjwt.version>
+    </properties>
+
+    <!-- ========== ④ 依赖版本管理（只声明版本，不真正引入） ========== -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot 全家桶版本 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring Cloud 全家桶版本（Gateway、OpenFeign、LoadBalancer） -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring Cloud Alibaba（Nacos 注册/配置中心） -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- MyBatis -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis-spring-boot.version}</version>
+            </dependency>
+
+            <!-- MySQL 驱动 -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector.version}</version>
+            </dependency>
+
+            <!-- JWT -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+
+            <!-- 自己的 common 模块（其他服务引用时不写版本号） -->
+            <dependency>
+                <groupId>com.studyspace</groupId>
+                <artifactId>studyspace-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- ========== ⑤ 公共插件配置 ========== -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
